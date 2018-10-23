@@ -1,8 +1,7 @@
 <template>
 <div>
 
-      <h5 class="is-size-5">{{ temp.lotset }}</h5>
-      <p>{{ temp.lot }}</p>
+      <h5 class="is-size-5">{{ lotset() }}</h5>
 
 </div>
 </template>
@@ -27,14 +26,21 @@ export default {
   name: 'Default',
   data () {
     return {
+      lotsets:[
+        {"handle":"ATL","active":true}
+        ,{"handle":"CLE","active":false}
+      ],
       map: null
   ,tileLayer: null
   ,layers: []
       ,"temp": {
-"lotset":null
   }
-  
+
 }
+  },
+  computed: {
+
+    // a computed getter
   },
   // firestore () {
   //   return {
@@ -47,12 +53,13 @@ export default {
     // this.gc_api = gapi;
     // this.handleClientLoad();
     // this.gc_api.load('client:auth2', this.initClient);
-      
+
     // console.log("this.gc_api in created",this.gc_api);
   },
   mounted() {
     console.log("mounted process.env.DEFAULTSET",process.env.DEFAULTSET)
-    this.temp.lotset=(typeof this.$route.params.lotset !== 'undefined')?this.$route.params.lotset:process.env.DEFAULTSET
+    let ns=(typeof this.$route.params.lotset !== 'undefined')?this.$route.params.lotset:process.env.DEFAULTSET
+    this.switchSet(ns);
 // this.initMap();
 //   this.initLayers();
   // console.log("this.map",this.map)
@@ -62,6 +69,12 @@ export default {
   // console.log("process.env::",process.env)
 },
   methods: {
+    switchSet(N){
+      console.log("switchSet N",N);
+    }
+    ,lotset(){
+      let y = this.$_.findWhere(this.lotsets,{active:true});
+      return y.handle}
 //     initMap() {
 //       this.map = L.map('map').setView([38.63, -90.23], 12);
 // this.tileLayer = L.tileLayer(
@@ -86,7 +99,7 @@ export default {
 // // WE NEED here: open hours and a source of occasional/emergency closures
 
 //     }
-  test(){
+  ,test(){
 // console.log("this.route",this.$route)
 // console.log("this.map",this.map)
 // console.log(this.$_.pluck(this.agencies,'name'))
