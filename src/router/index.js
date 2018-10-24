@@ -8,7 +8,7 @@ Vue.use(Router)
 export default new Router({
   routes: [
   {
-    path: '/:lot?',
+    path: '/:bbox?/:lot?',
     name: 'Default',
     component: Default
   }
