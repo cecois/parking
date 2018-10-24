@@ -1,7 +1,10 @@
 <template>
 <div>
-
-      <h5 class="is-size-5">{{ lotset() }}</h5>
+check out Dank Mono font
+<!-- menu if there are ever more than the atl set
+<h5 class="is-size-5">{{ lotset() }}</h5>
+-->
+    <div id="lot">{{lot}}</div>
 
 </div>
 </template>
@@ -26,11 +29,12 @@ export default {
   name: 'Default',
   data () {
     return {
-      lotsets:[
-        {"handle":"ATL","active":true}
-        ,{"handle":"CLE","active":false}
-      ],
-      map: null
+      // lotsets:[
+      //   {"handle":"ATL","active":true}
+      //   ,{"handle":"CLE","active":false}
+      // ],
+      lot:null
+      ,map: null
   ,tileLayer: null
   ,layers: []
       ,"temp": {
@@ -42,6 +46,9 @@ export default {
 
     // a computed getter
   },
+  watch: {
+      '$route': 'switchLot'
+    },
   // firestore () {
   //   return {
   //     appointments: db.collection('appointments')
@@ -49,7 +56,7 @@ export default {
   //   }
   // },
   created() {
-    console.log("created process.env.DEFAULTSET",process.env.DEFAULTSET)
+    // console.log("created process.env.DEFAULTSET",process.env.DEFAULTSET)
     // this.gc_api = gapi;
     // this.handleClientLoad();
     // this.gc_api.load('client:auth2', this.initClient);
@@ -57,9 +64,11 @@ export default {
     // console.log("this.gc_api in created",this.gc_api);
   },
   mounted() {
-    console.log("mounted process.env.DEFAULTSET",process.env.DEFAULTSET)
-    let ns=(typeof this.$route.params.lotset !== 'undefined')?this.$route.params.lotset:process.env.DEFAULTSET
-    this.switchSet(ns);
+    // console.log("mounted process.env.DEFAULTSET",process.env.DEFAULTSET)
+    let lotin=(typeof this.$route.params.lot !== 'undefined')?this.$route.params.lot:null;
+    this.switchLot(lotin);
+    // let ns=(typeof this.$route.params.lotset !== 'undefined')?this.$route.params.lotset:process.env.DEFAULTSET
+    // this.switchSet(ns);
 // this.initMap();
 //   this.initLayers();
   // console.log("this.map",this.map)
@@ -72,9 +81,23 @@ export default {
     switchSet(N){
       console.log("switchSet N",N);
     }
-    ,lotset(){
-      let y = this.$_.findWhere(this.lotsets,{active:true});
-      return y.handle}
+  ,switchLot(L){
+      console.log("switchLot L - later this will rerender the lots layer, unhighlighting and re-highlighting the right one null checks and all that shit",L);
+    }
+    // ,lotset(){
+    //   let y = this.$_.findWhere(this.lotsets,{active:true});
+    //   return y.handle
+    // }
+    ,fetchData() {
+       axios.get('https://api.coinmarketcap.com/v1/ticker/'+this.$route.params.lot+'/')
+       .then((resp) => {
+         this.coin = resp.data[0]
+         console.log(resp)
+       })
+       .catch((err) => {
+         console.log(err)
+       })
+     }
 //     initMap() {
 //       this.map = L.map('map').setView([38.63, -90.23], 12);
 // this.tileLayer = L.tileLayer(
@@ -412,8 +435,20 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
+#app{
+  color:red;
+  height:20vh;
+}
+#lot{
+  color:yellow;
+  height:20vh;
+  width:20%;
+  background-color:brown;
+  float: right;
+}
 #map{
   color:green;
+  background-color:black;
   height:100vh;
   width:100%;
 }
