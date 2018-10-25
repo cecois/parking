@@ -5,10 +5,15 @@
 -->
 
 <div id="notmap" class="columns">
-  <div class="column is-four-fifths">is-four-fifths ({{temp.msg}})</div>
-  <div class="column" id="lot">{{lot}}</div>
+  <div class="column is-three-fifths">is-three-fifths ({{temp.msg}})</div>
+  <div class="column" id="lot" v-bind:class="{'is-invisible':(!lot)}">
+    {{lot}}
+  </div>
 </div>
-      <div id="map" class="map"></div>
+            <div class="columns">
+      <div id="map" class="map column" v-bind:class="{'is-12':(!lot),'is-6':(lot)}"></div>
+            <div id="copy" class="column" v-bind:class="{'is-invisible':(!lot),'is-6':(lot)}">copy</div>
+            </div>
 </div>
 </template>
 
@@ -39,8 +44,8 @@ export default {
   },
   mounted() {
     this.lot=(typeof this.$route.params.lot !== 'undefined')?this.$route.params.lot:null;
-    this.initMap();
-    this.initLayers();
+    //this.initMap();
+    //this.initLayers();
 },
   methods: {
     fetchData() {
@@ -95,22 +100,23 @@ this.clients.related.push({})
 <style>
 #app{
   color:green;
-  height:15vh;
   padding:0;
   margin:0;
 }
 #lot{
   color:yellow;
   background-color:brown;
-  z-index:1;
+}
+#copy{
+  color:yellow;
+  background-color:violet;
+  z-index:-99;
 }
 #map{
   background-color:red;
-  height:100%;
-  z-index:-99;
-  position:absolute;
-  width:100%;
+  height:85vh;
   margin:0;padding:0;
+  z-index:-99;
 }
 #notmap{
   background-color:yellow;
