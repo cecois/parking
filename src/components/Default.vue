@@ -3,94 +3,48 @@
 <!-- menu if there are ever more than the atl set
 <h5 class="is-size-5">{{ lotset() }}</h5>
 -->
-    <div id="lot">{{lot}}</div>
-    <div id="map" class="map"></div>
 
+<div id="notmap" class="columns">
+  <div class="column is-four-fifths">is-four-fifths ({{temp.msg}})</div>
+  <div class="column" id="lot">{{lot}}</div>
+</div>
+      <div id="map" class="map"></div>
 </div>
 </template>
 
 <script>
-
-  // Client ID and API key from the Developer Console
-// const CLIENT_ID = '230137934084-ikbhaf92sv0g7i95gs74ojg2bahlsh24.apps.googleusercontent.com';
-// const API_KEY = 'AIzaSyBm5zyDSJlclRJv0ToTK2_r-DbYPveUam8';
-
-const CLIENT_ID = process.env.G_CLIENT_ID;
-const API_KEY = process.env.G_API_KEY;
-// Array of API discovery doc URLs for APIs used by the quickstart
-// const DISCOVERY_DOCS = ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'];
-// Authorization scopes required by the API; multiple scopes can be
-// included, separated by spaces.
-// const SCOPES = 'https://www.googleapis.com/auth/calendar';
-
-import { db } from '../main'
+// import { db } from '../main'
+// const CLIENT_ID = process.env.G_CLIENT_ID;
+// const API_KEY = process.env.G_API_KEY;
 
 export default {
   name: 'Default',
   data () {
     return {
-      // lotsets:[
-      //   {"handle":"ATL","active":true}
-      //   ,{"handle":"CLE","active":false}
-      // ],
-      lot:null
-      ,map: null
-  ,tileLayer: null
-  ,layers: []
-      ,"temp": {
+      lot: null,
+      map: null,
+  tileLayer: null,
+  layers: [],
+      "temp": {
+        msg:""
   }
-
 }
   },
   computed: {
-
-    // a computed getter
   },
   watch: {
-      // '$route': 'switchLot'
-      'this.map.move':function(){console.log("map moved")}
+    'lot': function(){this.$router.push({ params:{bbox:this.map.getBounds().toBBoxString(),lot:this.lot }})}
     },
-  // firestore () {
-  //   return {
-  //     appointments: db.collection('appointments')
-  //     // ,agencies:db.collection('agencies')
-  //   }
-  // },
   created() {
-    // console.log("created process.env.DEFAULTSET",process.env.DEFAULTSET)
-    // this.gc_api = gapi;
-    // this.handleClientLoad();
-    // this.gc_api.load('client:auth2', this.initClient);
-
-    // console.log("this.gc_api in created",this.gc_api);
   },
   mounted() {
-    // console.log("mounted process.env.DEFAULTSET",process.env.DEFAULTSET)
-    let lotin=(typeof this.$route.params.lot !== 'undefined')?this.$route.params.lot:null;
-    this.switchLot(lotin);
-    // let ns=(typeof this.$route.params.lotset !== 'undefined')?this.$route.params.lotset:process.env.DEFAULTSET
-    // this.switchSet(ns);
-this.initMap();
-  this.initLayers();
-  // console.log("this.map",this.map)
-    // this.gc_authorized=this.gc_api.auth2.getAuthInstance().isSignedIn
-    // console.log("this.gc_api",this.gc_api);
-  // console.log("NE:",process.env.NODE_ENV)
-  // console.log("process.env::",process.env)
+    this.lot=(typeof this.$route.params.lot !== 'undefined')?this.$route.params.lot:null;
+    this.initMap();
+    this.initLayers();
 },
   methods: {
-    switchSet(N){
-      console.log("switchSet N",N);
-    }
-  ,switchLot(L){
-      console.log("switchLot L - later this will rerender the lots layer, unhighlighting and re-highlighting the right one null checks and all that shit",L);
-    }
-    // ,lotset(){
-    //   let y = this.$_.findWhere(this.lotsets,{active:true});
-    //   return y.handle
-    // }
-    ,fetchData() {
-       axios.get('https://api.coinmarketcap.com/v1/ticker/'+this.$route.params.lot+'/')
+    fetchData() {
+       axios.get('https://api.coinmarketcap.com/v1/ticker/'+this.map.getBounds().toBBoxString()+'/')
        .then((resp) => {
          this.coin = resp.data[0]
          console.log(resp)
@@ -110,7 +64,14 @@ this.initMap();
      }
     ,initMap() {
       let bbox =(typeof this.$route.params.bbox !== 'undefined')?this.prepBbox(this.$route.params.bbox):[[33.14675022877648,-86.71783447265626],[34.25494631082515,-81.91680908203126]]
-      this.map = L.map('map').fitBounds(bbox);
+// a little of ye ol that=this
+      var that=this
+      this.map = L.map('map').fitBounds(bbox)
+      .on('moveend',function(e){
+that.$router.push({ params:{bbox:that.map.getBounds().toBBoxString(),lot:that.lot }})
+// that.temp.msg="updated "+that.$moment().format('YYYY.mm.dd, h:mm:ss a')
+      })
+
 this.tileLayer = L.tileLayer(
   'https://cartodb-basemaps-{s}.global.ssl.fastly.net/rastertiles/voyager/{z}/{x}/{y}.png',
   {
@@ -126,13 +87,9 @@ this.clients.related.push({})
     }
   ,test(){
 }
-  },//methods
-  computed: {
-
-}//computed
+  }// methods
 }
 </script>
-
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
@@ -144,14 +101,22 @@ this.clients.related.push({})
 }
 #lot{
   color:yellow;
-  height:10vh;
-  width:20%;
   background-color:brown;
-  float: right;
+  z-index:1;
 }
 #map{
   background-color:red;
-  height:85vh;
+  height:100%;
+  z-index:-99;
+  position:absolute;
+  width:100%;
+  margin:0;padding:0;
+}
+#notmap{
+  background-color:yellow;
+  height:15vh;
+  z-index:0;
+  position:relative;
   width:100%;
   margin:0;padding:0;
 }
