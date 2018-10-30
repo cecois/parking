@@ -10,10 +10,16 @@
     {{lot}}
   </div>
 </div>
-            <div class="columns">
-      <div id="map" class="map column" v-bind:class="{'is-12':(!lot),'is-6':(lot)}"></div>
-            <div id="copy" class="column" v-bind:class="{'is-invisible':(!lot),'is-6':(lot)}">copy</div>
-            </div>
+      <div id="map" class="map"></div>
+
+            <div class="modal"  v-bind:class="{'is-active':(slug)}">
+  <div class="modal-background"></div>
+  <div class="modal-content">
+    <div id="copy" class="">copy</div>
+  </div>
+  <button class="modal-close is-large" aria-label="close" v-on:click="slug=null"></button>
+</div>
+
 </div>
 </template>
 
@@ -27,9 +33,11 @@ export default {
   data () {
     return {
       lot: null,
+      slug: null,
+      supply:null,
       map: null,
   tileLayer: null,
-  layers: [],
+  lots: null,
       "temp": {
         msg:""
   }
@@ -38,26 +46,55 @@ export default {
   computed: {
   },
   watch: {
-    'lot': function(){this.$router.push({ params:{bbox:this.map.getBounds().toBBoxString(),lot:this.lot }})}
+    lot: function() {this.routize();}
+  ,slug: function() {this.routize();}
+  ,supply: function() {this.lrender();}
     },
   created() {
   },
   mounted() {
     this.lot=(typeof this.$route.params.lot !== 'undefined')?this.$route.params.lot:null;
-    //this.initMap();
-    //this.initLayers();
+    this.slug=(typeof this.$route.params.slug !== 'undefined')?this.$route.params.slug:null;
+    this.initMap();
+    this.initLayers();
 },
   methods: {
-    fetchData() {
-       axios.get('https://api.coinmarketcap.com/v1/ticker/'+this.map.getBounds().toBBoxString()+'/')
-       .then((resp) => {
-         this.coin = resp.data[0]
-         console.log(resp)
-       })
-       .catch((err) => {
-         console.log(err)
-       })
-     }
+    style(f){
+      console.log("feature:",f);
+      let s = {
+fill:true
+,color:'black'
+,fillColor:'black'
+,fillOpacity:.5
+      }
+      return s;
+    },
+    routize(){
+      this.$router.push({ params:{bbox:this.map.getBounds().toBBoxString(),lot:this.lot,slug:this.slug }})
+    },
+    lrender(){
+
+this.lots.clearLayers();
+this.lots.addLayer(L.geoJson(this.supply, {style:function (f) {
+  console.log("f.properties",f.properties);
+        return {
+fill:true
+,color:'black'
+,fillColor:'black'
+,fillOpacity:.5
+      };
+    }}));
+}
+    // fetchData() {
+    //    axios.get('https://api.coinmarketcap.com/v1/ticker/'+this.map.getBounds().toBBoxString()+'/')
+    //    .then((resp) => {
+    //      this.coin = resp.data[0]
+    //      console.log(resp)
+    //    })
+    //    .catch((err) => {
+    //      console.log(err)
+    //    })
+    //  }
      ,prepBbox(b){
        let a = b.split(",")
        if(a.length<4){return "invalid bbox string"}else{
@@ -68,12 +105,13 @@ export default {
        }
      }
     ,initMap() {
-      let bbox =(typeof this.$route.params.bbox !== 'undefined')?this.prepBbox(this.$route.params.bbox):[[33.14675022877648,-86.71783447265626],[34.25494631082515,-81.91680908203126]]
+      let bbox =(typeof this.$route.params.bbox !== 'undefined')?this.prepBbox(this.$route.params.bbox):[[33.64197541854496,-84.84937816858294],[33.86519744005887,-83.85168224573135]]
 // a little of ye ol that=this
       var that=this
       this.map = L.map('map').fitBounds(bbox)
       .on('moveend',function(e){
-that.$router.push({ params:{bbox:that.map.getBounds().toBBoxString(),lot:that.lot }})
+// that.$router.push({ params:{bbox:that.map.getBounds().toBBoxString(),lot:that.lot }})
+that.routize()
 // that.temp.msg="updated "+that.$moment().format('YYYY.mm.dd, h:mm:ss a')
       })
 
@@ -84,13 +122,31 @@ this.tileLayer = L.tileLayer(
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attribution">CARTO</a>'
   }
 );
+
+this.lots = L.layerGroup(null).addTo(this.map)
+
 this.tileLayer.addTo(this.map);
+
+// this.lots.addTo(this.map);
+
+axios.get('https://cecmcgee.carto.com/api/v2/sql?format=GeoJSON&q=SELECT * FROM atl_tax_parcel_parking')
+    .then(response => {
+      // JSON responses are automatically parsed.
+      this.supply = response.data
+    })
+    .catch(e => {
+      this.errors.push(e)
+    })
+
+
+
     },
   initLayers() {},
     add_client_addl(){
 this.clients.related.push({})
     }
   ,test(){
+    console.info("test method")
 }
   }// methods
 }
@@ -109,12 +165,13 @@ this.clients.related.push({})
 }
 #copy{
   color:yellow;
-  background-color:violet;
-  z-index:-99;
+  font-weight:800;
 }
 #map{
   background-color:red;
   height:85vh;
+  width:100%;
+  position:absolute;
   margin:0;padding:0;
   z-index:-99;
 }
