@@ -7,11 +7,11 @@ Vue.use(Router)
 
 export default new Router({
   routes: [
-  {
-    path: '/:bbox?/:lot?',
-    name: 'Default',
-    component: Default
-  }
+    {
+      path: '/:bbox?/:lot?/:slug?',
+      name: 'Default',
+      component: Default
+    }
   // ,{
   //   path: '/atl',
   //   name: 'ATL',
