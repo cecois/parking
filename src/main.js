@@ -13,6 +13,8 @@ import App from './App'
 import router from './router'
 import underscore from 'vue-underscore'
 
+
+
 // firebase stuff
 // import VueFire from 'vuefire'
 // import VUEFIRESTORE from 'vue-firestore'
