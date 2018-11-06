@@ -5,7 +5,8 @@
 -->
 
 <div id="notmap" class="columns">
-  <div class="column is-one-fifth">I'm a Lot!</div>
+  <div id="brand" class="column is-one-fifth">I'm a Lot</div>
+  <div id="brand" class="column is-one-fifth"></div>
   <div class="column has-text-right" id="bio" v-bind:class="{'is-invisible':(!bio)}">
     {{bio}}
   </div>
@@ -51,7 +52,7 @@ export default {
   computed: {
   },
   watch: {
-    lot: function() {this.routize();this.substyle();}
+    lot: function() {this.routize();this.lrender();}
   ,slug: function() {this.routize();}
   ,supply: function() {this.lrender();}
     },
@@ -62,10 +63,11 @@ export default {
     this.slug=(typeof this.$route.params.slug !== 'undefined')?this.$route.params.slug:null;
     this.initMap();
     this.initLayers();
+    this.substyle();
 },
   methods: {
     defaultStyle(){
-let that=this;
+var that=this;
 return {
       fill:true
       ,color:that.color_default
@@ -73,23 +75,27 @@ return {
       ,fillOpacity:.5
       ,opacity:.5
             }
-
     },
-    substyle(){
-let that = this;
-this.lots.eachLayer(function (layergrouplayer) {
-
-
-
-layergrouplayer.eachLayer(function(f){
-  if(f.feature.properties.objectid==that.lot){
-    f.setStyle(
-      {
+    activeStyle(){
+var that=this;
+return  {
       fill:true
       ,color:that.color_active
       ,fillColor:that.color_active
       ,fillOpacity:.7
             }
+    },
+    substyle(){
+var that = this;
+this.lots.eachLayer(function (layergrouplayer) {
+
+layergrouplayer.eachLayer(function(f){
+
+  if(f.feature.properties.objectid==that.lot){
+      console.log("f.feature.properties.objectid v that.log")
+  console.log(f.feature.properties.objectid,that.lot)
+    f.setStyle(
+     that.activeStyle()
       )
     that.bio=f.feature.properties.bio
     that.map.fitBounds(f.getBounds())
@@ -98,8 +104,9 @@ layergrouplayer.eachLayer(function(f){
   }
   f.bindPopup(f.feature.properties.siteaddres+", "+f.feature.properties.sitecity);
   f.on('click',function(e){
-    that.lot=e.sourceTarget.feature.properties.cartodb_id
-    that.bio=e.sourceTarget.feature.properties.bio
+    // e.sourceTarget.setStyle(that.activeStyle())
+    that.lot=e.sourceTarget.feature.properties.objectid
+    // that.bio=e.sourceTarget.feature.properties.bio
   })
 })
   // that.$_.each(layergrouplayer,(feature)=>{
@@ -116,7 +123,6 @@ layergrouplayer.eachLayer(function(f){
       this.$router.push({ params:{bbox:this.map.getBounds().toBBoxString(),lot:this.lot,slug:this.slug }})
     },
     lrender(){
-
 this.lots.clearLayers();
 this.lots.addLayer(L.geoJson(this.supply, {style:this.defaultStyle()}));
 
@@ -198,29 +204,37 @@ this.clients.related.push({})
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
+#brand{
+  font-size:2.6em;
+  font-weight:800;
+  font-family: 'Slabo 27px', serif;
+  letter-spacing:0px;
+    padding:.5% 3%;
+}
 #app{
-  color:green;
   padding:0;
   margin:0;
 }
 #lot{
   color:yellow;
-  background-color:brown;
+}
+#bio{
+  padding:.5% 3%;
 }
 #copy{
   color:yellow;
   font-weight:800;
 }
 #map{
-  height:85vh;
+  height:88vh;
   width:100%;
   position:absolute;
   margin:0;padding:0;
   z-index:-99;
 }
 #notmap{
-  background-color:yellow;
-  height:15vh;
+  background-color:white;
+  height:12vh;
   z-index:0;
   position:relative;
   width:100%;
