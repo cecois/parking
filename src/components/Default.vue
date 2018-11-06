@@ -5,9 +5,10 @@
 -->
 
 <div id="notmap" class="columns">
-  <div class="column is-three-fifths">is-three-fifths ({{temp.msg}})</div>
-  <div class="column" id="lot" v-bind:class="{'is-invisible':(!lot)}">
-    {{lot}}
+  <div id="brand" class="column is-one-fifth">I'm a Lot</div>
+  <div id="brand" class="column is-one-fifth"></div>
+  <div class="column has-text-right" id="bio" v-bind:class="{'is-invisible':(!bio)}">
+    {{bio}}
   </div>
 </div>
       <div id="map" class="map"></div>
@@ -24,15 +25,20 @@
 </template>
 
 <script>
+  // import AUTHORS from '../assets/lots-atl.geojson'
 // import { db } from '../main'
 // const CLIENT_ID = process.env.G_CLIENT_ID;
 // const API_KEY = process.env.G_API_KEY;
+const MODE=process.env.MODE
 
 export default {
   name: 'Default',
   data () {
     return {
+      color_default:'pink',
+      color_active:'yellow',
       lot: null,
+      bio: null,
       slug: null,
       supply:null,
       map: null,
@@ -46,7 +52,7 @@ export default {
   computed: {
   },
   watch: {
-    lot: function() {this.routize();}
+    lot: function() {this.routize();this.lrender();}
   ,slug: function() {this.routize();}
   ,supply: function() {this.lrender();}
     },
@@ -57,33 +63,70 @@ export default {
     this.slug=(typeof this.$route.params.slug !== 'undefined')?this.$route.params.slug:null;
     this.initMap();
     this.initLayers();
+    this.substyle();
 },
   methods: {
-    style(f){
-      console.log("feature:",f);
-      let s = {
-fill:true
-,color:'black'
-,fillColor:'black'
-,fillOpacity:.5
-      }
-      return s;
+    defaultStyle(){
+var that=this;
+return {
+      fill:true
+      ,color:that.color_default
+      ,fillColor:that.color_default
+      ,fillOpacity:.5
+      ,opacity:.5
+            }
+    },
+    activeStyle(){
+var that=this;
+return  {
+      fill:true
+      ,color:that.color_active
+      ,fillColor:that.color_active
+      ,fillOpacity:.7
+            }
+    },
+    substyle(){
+var that = this;
+this.lots.eachLayer(function (layergrouplayer) {
+
+layergrouplayer.eachLayer(function(f){
+
+  if(f.feature.properties.objectid==that.lot){
+      console.log("f.feature.properties.objectid v that.log")
+  console.log(f.feature.properties.objectid,that.lot)
+    f.setStyle(
+     that.activeStyle()
+      )
+    that.bio=f.feature.properties.bio
+    that.map.fitBounds(f.getBounds())
+  } else {
+    f.setStyle(that.defaultStyle())
+  }
+  f.bindPopup(f.feature.properties.siteaddres+", "+f.feature.properties.sitecity);
+  f.on('click',function(e){
+    // e.sourceTarget.setStyle(that.activeStyle())
+    that.lot=e.sourceTarget.feature.properties.objectid
+    // that.bio=e.sourceTarget.feature.properties.bio
+  })
+})
+  // that.$_.each(layergrouplayer,(feature)=>{
+  //   console.log("each of lgls, feature:",feature);
+  // });//each
+
+  // let styl = this.style(layer);
+  // layer.setStyle(styl)
+    // layer.bindPopup('Hello');
+});
+
     },
     routize(){
       this.$router.push({ params:{bbox:this.map.getBounds().toBBoxString(),lot:this.lot,slug:this.slug }})
     },
     lrender(){
-
 this.lots.clearLayers();
-this.lots.addLayer(L.geoJson(this.supply, {style:function (f) {
-  console.log("f.properties",f.properties);
-        return {
-fill:true
-,color:'black'
-,fillColor:'black'
-,fillOpacity:.5
-      };
-    }}));
+this.lots.addLayer(L.geoJson(this.supply, {style:this.defaultStyle()}));
+
+this.substyle();
 }
     // fetchData() {
     //    axios.get('https://api.coinmarketcap.com/v1/ticker/'+this.map.getBounds().toBBoxString()+'/')
@@ -116,7 +159,8 @@ that.routize()
       })
 
 this.tileLayer = L.tileLayer(
-  'https://cartodb-basemaps-{s}.global.ssl.fastly.net/rastertiles/voyager/{z}/{x}/{y}.png',
+  // 'https://cartodb-basemaps-{s}.global.ssl.fastly.net/rastertiles/voyager/{z}/{x}/{y}.png',
+  'http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
   {
     maxZoom: 18,
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attribution">CARTO</a>'
@@ -129,6 +173,12 @@ this.tileLayer.addTo(this.map);
 
 // this.lots.addTo(this.map);
 
+// if(MODE=='T'){
+// console.log("AUTHORS:",AUTHORS)
+//   this.supply = AUTHORS
+// }
+// else {
+
 axios.get('https://cecmcgee.carto.com/api/v2/sql?format=GeoJSON&q=SELECT * FROM atl_tax_parcel_parking')
     .then(response => {
       // JSON responses are automatically parsed.
@@ -137,7 +187,7 @@ axios.get('https://cecmcgee.carto.com/api/v2/sql?format=GeoJSON&q=SELECT * FROM 
     .catch(e => {
       this.errors.push(e)
     })
-
+// }
 
 
     },
@@ -154,30 +204,37 @@ this.clients.related.push({})
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
+#brand{
+  font-size:2.6em;
+  font-weight:800;
+  font-family: 'Slabo 27px', serif;
+  letter-spacing:0px;
+    padding:.5% 3%;
+}
 #app{
-  color:green;
   padding:0;
   margin:0;
 }
 #lot{
   color:yellow;
-  background-color:brown;
+}
+#bio{
+  padding:.5% 3%;
 }
 #copy{
   color:yellow;
   font-weight:800;
 }
 #map{
-  background-color:red;
-  height:85vh;
+  height:88vh;
   width:100%;
   position:absolute;
   margin:0;padding:0;
   z-index:-99;
 }
 #notmap{
-  background-color:yellow;
-  height:15vh;
+  background-color:white;
+  height:12vh;
   z-index:0;
   position:relative;
   width:100%;
