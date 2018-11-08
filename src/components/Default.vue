@@ -1,16 +1,14 @@
 <template>
 <div>
-<!-- menu if there are ever more than the atl set
-<h5 class="is-size-5">{{ lotset() }}</h5>
--->
 
 <div id="notmap" class="columns">
   <div id="brand" class="column is-one-fifth">I'm a Lot</div>
   <div id="brand" class="column is-one-fifth"></div>
-  <div class="column has-text-right" id="bio" v-bind:class="{'is-invisible':(!bio)}">
+</div>
+
+<div class="has-text-right is-pulled-right" id="bio" v-bind:class="{'is-invisible':(!bio)}">
     {{bio}}
   </div>
-</div>
       <div id="map" class="map"></div>
 
             <div class="modal"  v-bind:class="{'is-active':(slug)}">
@@ -25,17 +23,13 @@
 </template>
 
 <script>
-  // import AUTHORS from '../assets/lots-atl.geojson'
-// import { db } from '../main'
-// const CLIENT_ID = process.env.G_CLIENT_ID;
-// const API_KEY = process.env.G_API_KEY;
 const MODE=process.env.MODE
 
 export default {
   name: 'Default',
   data () {
     return {
-      color_default:'pink',
+      color_default:'white',
       color_active:'yellow',
       lot: null,
       bio: null,
@@ -104,18 +98,9 @@ layergrouplayer.eachLayer(function(f){
   }
   f.bindPopup(f.feature.properties.siteaddres+", "+f.feature.properties.sitecity);
   f.on('click',function(e){
-    // e.sourceTarget.setStyle(that.activeStyle())
     that.lot=e.sourceTarget.feature.properties.objectid
-    // that.bio=e.sourceTarget.feature.properties.bio
   })
 })
-  // that.$_.each(layergrouplayer,(feature)=>{
-  //   console.log("each of lgls, feature:",feature);
-  // });//each
-
-  // let styl = this.style(layer);
-  // layer.setStyle(styl)
-    // layer.bindPopup('Hello');
 });
 
     },
@@ -128,16 +113,6 @@ this.lots.addLayer(L.geoJson(this.supply, {style:this.defaultStyle()}));
 
 this.substyle();
 }
-    // fetchData() {
-    //    axios.get('https://api.coinmarketcap.com/v1/ticker/'+this.map.getBounds().toBBoxString()+'/')
-    //    .then((resp) => {
-    //      this.coin = resp.data[0]
-    //      console.log(resp)
-    //    })
-    //    .catch((err) => {
-    //      console.log(err)
-    //    })
-    //  }
      ,prepBbox(b){
        let a = b.split(",")
        if(a.length<4){return "invalid bbox string"}else{
@@ -153,13 +128,10 @@ this.substyle();
       var that=this
       this.map = L.map('map').fitBounds(bbox)
       .on('moveend',function(e){
-// that.$router.push({ params:{bbox:that.map.getBounds().toBBoxString(),lot:that.lot }})
 that.routize()
-// that.temp.msg="updated "+that.$moment().format('YYYY.mm.dd, h:mm:ss a')
       })
 
 this.tileLayer = L.tileLayer(
-  // 'https://cartodb-basemaps-{s}.global.ssl.fastly.net/rastertiles/voyager/{z}/{x}/{y}.png',
   'http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
   {
     maxZoom: 18,
@@ -170,14 +142,6 @@ this.tileLayer = L.tileLayer(
 this.lots = L.layerGroup(null).addTo(this.map)
 
 this.tileLayer.addTo(this.map);
-
-// this.lots.addTo(this.map);
-
-// if(MODE=='T'){
-// console.log("AUTHORS:",AUTHORS)
-//   this.supply = AUTHORS
-// }
-// else {
 
 axios.get('https://cecmcgee.carto.com/api/v2/sql?format=GeoJSON&q=SELECT * FROM atl_tax_parcel_parking')
     .then(response => {
@@ -220,13 +184,18 @@ this.clients.related.push({})
 }
 #bio{
   padding:.5% 3%;
+  background-color:rgba(255,255,255,.9);
+  letter-spacing: -2px;
+  font-size:2em;
+  height:100%;
+  width:90%;
 }
 #copy{
   color:yellow;
   font-weight:800;
 }
 #map{
-  height:88vh;
+  height:85vh;
   width:100%;
   position:absolute;
   margin:0;padding:0;
@@ -234,7 +203,7 @@ this.clients.related.push({})
 }
 #notmap{
   background-color:white;
-  height:12vh;
+  height:15vh;
   z-index:0;
   position:relative;
   width:100%;
