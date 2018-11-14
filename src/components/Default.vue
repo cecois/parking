@@ -11,14 +11,6 @@
   </div>
       <div id="map" class="map"></div>
 
-            <div class="modal"  v-bind:class="{'is-active':(slug)}">
-  <div class="modal-background"></div>
-  <div class="modal-content">
-    <div id="copy" class="">copy</div>
-  </div>
-  <button class="modal-close is-large" aria-label="close" v-on:click="slug=null"></button>
-</div>
-
 </div>
 </template>
 
@@ -57,10 +49,10 @@ export default {
 }
   },
   computed: {
-// basemap:function(){
-//   // return this.basemaps[0];
-//   return this.$_.findWhere(this.basemaps, {active:true});
-// }
+basemap:function(){
+  // return this.basemaps[0];
+  return this.$_.findWhere(this.basemaps, {active:true});
+}
   },
   watch: {
     lot: function() {this.routize();this.lrender();}
@@ -68,20 +60,20 @@ export default {
   ,supply: function() {this.lrender();}
     },
   created() {
-    this.basemap=(typeof this.$route.params.basemap !== 'undefined')?this.switchMap(this.$route.params.basemap):this.$_.findWhere(this.basemaps, {active:true});
-    this.color_active=(typeof this.$route.params.hue !== 'undefined')?this.$route.params.hue:'yellow';    
+    // this.basemap=(typeof this.$route.params.basemap !== 'undefined')?this.switchMap(this.$route.params.basemap):this.$_.findWhere(this.basemaps, {active:true});
   },
   mounted() {
+    if(typeof this.$route.params.map !== 'undefined' && this.$route.params.map!==null){this.switchMap(this.$route.params.map)}else{this.$_.findWhere(this.basemaps, {active:true});}
+    this.color_active=(typeof this.$route.params.hue !== 'undefined')?this.$route.params.hue:'yellow';
 this.lot=(typeof this.$route.params.lot !== 'undefined')?this.$route.params.lot:null;
     this.slug=(typeof this.$route.params.slug !== 'undefined')?this.$route.params.slug:null;
-    
+
     this.initMap();
     this.initLayers();
     this.substyle();
 },
   methods: {
     switchMap(n){
-console.log("switching basemap to ",n);
       this.$_.each(this.basemaps,(b)=>{
         if(b.key==n){b.active=true}else{b.active=false}
       })
@@ -159,7 +151,7 @@ that.routize()
       })
 
 this.tileLayer = L.tileLayer(
-  this.basemap.uri,
+  this.$_.findWhere(this.basemaps, {active:true}).uri,
   {
     maxZoom: 18,
     attribution: '&copy; data:<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; basemap:'+this.basemap.source
