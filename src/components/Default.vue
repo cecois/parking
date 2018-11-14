@@ -10,7 +10,11 @@
     {{bio}}
   </div>
       <div id="map" class="map"></div>
-
+<ul id="map-menu" class="columns is-overlay">
+  <li v-for="map in this.basemaps" class="column">
+    <div class="map-menu-item" v-bind:class="{'active':(map.active)}"></div>
+    </li>
+</ul>
 </div>
 </template>
 
@@ -214,12 +218,33 @@ this.clients.related.push({})
   font-weight:800;
 }
 #map{
-  height:85vh;
+  height:70vh;
   width:100%;
   position:absolute;
   margin:0;padding:0;
   z-index:-99;
 }
+#map-menu{
+  height:15vh;
+  width:50%;
+  position:relative;
+  margin:0;padding:0 2%;
+  bottom:0;
+  background-color:rgba(255,255,255,.5);
+}
+  #map-menu > li > .map-menu-item{
+    background-color:white;
+    padding: 0px;
+/* line-height: 34px; */
+border-radius:50%;
+    /* margin-right:1%; */
+    border-color:black;
+    border-style: solid;
+    border-width:2px;
+    height:34px;
+    width:34px;
+  }
+    #map-menu > li > .map-menu-item.active{background-color:red;}
 #notmap{
   background-color:white;
   height:15vh;
