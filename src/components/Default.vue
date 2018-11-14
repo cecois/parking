@@ -29,8 +29,21 @@ export default {
   name: 'Default',
   data () {
     return {
+      basemaps:[
+      {source:"carto.com",key:"dark_all",uri:"http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png",active:false}
+      ,{source:"carto.com",key:"light_all",uri:"http://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png",active:false}
+      ,{source:"esri",key:"esri_gray_dark",uri:"http://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}",active:false}
+      ,{source:"esri",key:"esri_gray_light",uri:"http://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}",active:false}
+      ,{source:"esri",key:"esri_natgeo",uri:"http://services.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}",active:false}
+      ,{source:"wmflabs.org",key:"mapnik_bw",uri:"http://a.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png",active:false}
+      ,{source:"stamen.com",key:"stamen_toner",uri:"http://tile.stamen.com/toner/{z}/{x}/{y}.png",active:false}
+      ,{source:"stamen.com",key:"stamen_toner_lite",uri:"http://tile.stamen.com/toner-lite/{z}/{x}/{y}.png",active:false}
+      ,{source:"stamen.com",key:"stamen_watercolor",uri:"http://tile.stamen.com/watercolor/{z}/{x}/{y}.jpg",active:false}
+      ,{source:"waze.com",key:"waze_us",uri:"https://livemap-tiles3.waze.com/tiles/{z}/{x}/{y}.png",active:false}
+      ,{source:"yandex.net",key:"yandex",uri:"http://vec01.maps.yandex.net/tiles?l=map&x={x}&y={y}&z={z}",active:true}
+      ],
       color_default:'white',
-      color_active:'yellow',
+      color_active:null,
       lot: null,
       bio: null,
       slug: null,
@@ -44,6 +57,10 @@ export default {
 }
   },
   computed: {
+// basemap:function(){
+//   // return this.basemaps[0];
+//   return this.$_.findWhere(this.basemaps, {active:true});
+// }
   },
   watch: {
     lot: function() {this.routize();this.lrender();}
@@ -51,15 +68,25 @@ export default {
   ,supply: function() {this.lrender();}
     },
   created() {
+    this.basemap=(typeof this.$route.params.basemap !== 'undefined')?this.switchMap(this.$route.params.basemap):this.$_.findWhere(this.basemaps, {active:true});
+    this.color_active=(typeof this.$route.params.hue !== 'undefined')?this.$route.params.hue:'yellow';    
   },
   mounted() {
-    this.lot=(typeof this.$route.params.lot !== 'undefined')?this.$route.params.lot:null;
+this.lot=(typeof this.$route.params.lot !== 'undefined')?this.$route.params.lot:null;
     this.slug=(typeof this.$route.params.slug !== 'undefined')?this.$route.params.slug:null;
+    
     this.initMap();
     this.initLayers();
     this.substyle();
 },
   methods: {
+    switchMap(n){
+console.log("switching basemap to ",n);
+      this.$_.each(this.basemaps,(b)=>{
+        if(b.key==n){b.active=true}else{b.active=false}
+      })
+
+    },
     defaultStyle(){
 var that=this;
 return {
@@ -105,7 +132,7 @@ layergrouplayer.eachLayer(function(f){
 
     },
     routize(){
-      this.$router.push({ params:{bbox:this.map.getBounds().toBBoxString(),lot:this.lot,slug:this.slug }})
+      this.$router.push({ params:{bbox:this.map.getBounds().toBBoxString(),lot:this.lot,slug:this.slug,basemap:this.basemap,hue:this.color_active }})
     },
     lrender(){
 this.lots.clearLayers();
@@ -132,10 +159,10 @@ that.routize()
       })
 
 this.tileLayer = L.tileLayer(
-  'http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
+  this.basemap.uri,
   {
     maxZoom: 18,
-    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attribution">CARTO</a>'
+    attribution: '&copy; data:<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; basemap:'+this.basemap.source
   }
 );
 
