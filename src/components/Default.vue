@@ -2,7 +2,9 @@
 <div>
 
 <div id="notmap" class="columns">
-  <div id="brand" class="column is-one-fifth">I'm a Lot</div>
+  <div id="brand" class="column is-one-fifth">
+    <!-- I'm a Lot -->
+  </div>
   <div id="brand" class="column is-one-fifth"></div>
 </div>
 
@@ -22,7 +24,7 @@
     show:0,
     hide: 50,
   },
-}" class="map-menu-item" v-bind:class="{'active':(map.active)}" style="background-image: url('assets/dark_all.png');"></div>
+}" class="map-menu-item" v-bind:class="{'active':(map.active)}" style='background-image: url("../assets/dark_all.png");'></div>
     </li>
 </ul>
 </div>
@@ -240,7 +242,7 @@ this.clients.related.push({})
   position:absolute;
   /*margin:0;padding:0 2%;*/
   margin:0;
-  padding:1% 1%;
+  padding:.5% .5%;
   bottom:0;
   background-color:rgba(255,255,255,.5);
   z-index:-98;
