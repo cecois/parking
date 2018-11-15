@@ -8,6 +8,8 @@ import 'vue-simple-suggest/dist/styles.css' // Optional CSS
 import Buefy from 'buefy'
 import 'buefy/lib/buefy.css'
 import moment from 'moment'
+import VTooltip from 'v-tooltip'
+
 
 import App from './App'
 import router from './router'
@@ -29,6 +31,7 @@ import underscore from 'vue-underscore'
 // Object.defineProperty(Vue.prototype, '$levenshtein', { value: levenshtein });
 
 Vue.use(underscore)
+Vue.use(VTooltip)
 
 Object.defineProperty(Vue.prototype, '$moment', { value: moment })
 

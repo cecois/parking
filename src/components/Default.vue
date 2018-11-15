@@ -10,9 +10,19 @@
     {{bio}}
   </div>
       <div id="map" class="map"></div>
-<ul id="map-menu" class="columns is-overlay">
+<ul id="map-menu" class="columns is-one-third">
   <li v-for="map in this.basemaps" class="column">
-    <div class="map-menu-item" v-bind:class="{'active':(map.active)}"></div>
+    <div v-tooltip="{
+  content: map.nom,
+  placement: 'top-center',
+  classes: ['info'],
+  targetClasses: ['it-has-a-tooltip'],
+  offset: 10,
+  delay: {
+    show:0,
+    hide: 50,
+  },
+}" class="map-menu-item" v-bind:class="{'active':(map.active)}" style="background-image: url('assets/dark_all.png');"></div>
     </li>
 </ul>
 </div>
@@ -26,17 +36,17 @@ export default {
   data () {
     return {
       basemaps:[
-      {source:"carto.com",key:"dark_all",uri:"http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png",active:false}
-      ,{source:"carto.com",key:"light_all",uri:"http://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png",active:false}
-      ,{source:"esri",key:"esri_gray_dark",uri:"http://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}",active:false}
-      ,{source:"esri",key:"esri_gray_light",uri:"http://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}",active:false}
-      ,{source:"esri",key:"esri_natgeo",uri:"http://services.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}",active:false}
-      ,{source:"wmflabs.org",key:"mapnik_bw",uri:"http://a.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png",active:false}
-      ,{source:"stamen.com",key:"stamen_toner",uri:"http://tile.stamen.com/toner/{z}/{x}/{y}.png",active:false}
-      ,{source:"stamen.com",key:"stamen_toner_lite",uri:"http://tile.stamen.com/toner-lite/{z}/{x}/{y}.png",active:false}
-      ,{source:"stamen.com",key:"stamen_watercolor",uri:"http://tile.stamen.com/watercolor/{z}/{x}/{y}.jpg",active:false}
-      ,{source:"waze.com",key:"waze_us",uri:"https://livemap-tiles3.waze.com/tiles/{z}/{x}/{y}.png",active:false}
-      ,{source:"yandex.net",key:"yandex",uri:"http://vec01.maps.yandex.net/tiles?l=map&x={x}&y={y}&z={z}",active:true}
+      {source:"carto.com",key:"dark_all",nom:"Carto Dark",uri:"http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png",active:true}
+      ,{source:"carto.com",key:"light_all",nom:"Carto Light",uri:"http://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png",active:false}
+      ,{source:"esri",key:"esri_gray_dark",nom:"Esri Gray Dark",uri:"http://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}",active:false}
+      ,{source:"esri",key:"esri_gray_light",nom:"Esri Gray Light",uri:"http://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}",active:false}
+      ,{source:"esri",key:"esri_natgeo",nom:"Esri National Geographic",uri:"http://services.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}",active:false}
+      ,{source:"wmflabs.org",key:"mapnik_bw",nom:"Mapnik B/W",uri:"http://a.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png",active:false}
+      ,{source:"stamen.com",key:"stamen_toner",nom:"Stamen Toner",uri:"http://tile.stamen.com/toner/{z}/{x}/{y}.png",active:false}
+      ,{source:"stamen.com",key:"stamen_toner_lite",nom:"Stamen Toner Light",uri:"http://tile.stamen.com/toner-lite/{z}/{x}/{y}.png",active:false}
+      ,{source:"stamen.com",key:"stamen_watercolor",nom:"Stamen Watercolor",uri:"http://tile.stamen.com/watercolor/{z}/{x}/{y}.jpg",active:false}
+      ,{source:"waze.com",key:"waze_us",nom:"Waze US",uri:"https://livemap-tiles3.waze.com/tiles/{z}/{x}/{y}.png",active:false}
+      ,{source:"yandex.net",key:"yandex",nom:"Yandex",uri:"http://vec01.maps.yandex.net/tiles?l=map&x={x}&y={y}&z={z}",active:false}
       ],
       color_default:'white',
       color_active:null,
@@ -218,33 +228,46 @@ this.clients.related.push({})
   font-weight:800;
 }
 #map{
-  height:70vh;
+  height:85vh;
   width:100%;
   position:absolute;
   margin:0;padding:0;
   z-index:-99;
 }
 #map-menu{
-  height:15vh;
-  width:50%;
-  position:relative;
-  margin:0;padding:0 2%;
+  height:5vh;
+  /*width:30%;*/
+  position:absolute;
+  /*margin:0;padding:0 2%;*/
+  margin:0;
+  padding:1% 1%;
   bottom:0;
   background-color:rgba(255,255,255,.5);
+  z-index:-98;
 }
+
+#map-menu > li{padding:0 3px;}
+
   #map-menu > li > .map-menu-item{
     background-color:white;
     padding: 0px;
 /* line-height: 34px; */
 border-radius:50%;
     /* margin-right:1%; */
-    border-color:black;
+    border-color:white;
     border-style: solid;
-    border-width:2px;
+    border-width:1px;
     height:34px;
     width:34px;
   }
-    #map-menu > li > .map-menu-item.active{background-color:red;}
+  #map-menu > li > .map-menu-item:hover{
+    border-color:black;
+      box-shadow: 0px 0px 2px 1px rgba(0, 0, 0, .2)
+  }
+    #map-menu > li > .map-menu-item.active{
+      border-color:black;
+      box-shadow: 0px 0px 2px 1px rgba(0, 0, 0, .8)
+    }
 #notmap{
   background-color:white;
   height:15vh;
@@ -253,4 +276,114 @@ border-radius:50%;
   width:100%;
   margin:0;padding:0;
 }
+/** --------------------------------------------- tooltip ----------------- **/
+.tooltip {
+  display: block !important;
+  z-index: 10000;
+}
+
+.tooltip .tooltip-inner {
+  background: black;
+  opacity: .5;
+  color: white;
+  border-radius: 3px;
+  padding: 5px 10px 4px;
+}
+
+.tooltip .tooltip-arrow {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  position: absolute;
+  margin: 5px;
+  border-color: black;
+  z-index: 1;
+}
+
+.tooltip[x-placement^="top"] {
+  margin-bottom: 5px;
+}
+
+.tooltip[x-placement^="top"] .tooltip-arrow {
+  border-width: 5px 5px 0 5px;
+  border-left-color: transparent !important;
+  border-right-color: transparent !important;
+  border-bottom-color: transparent !important;
+  opacity:.5;
+  bottom: -5px;
+  left: calc(50% - 5px);
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.tooltip[x-placement^="bottom"] {
+  margin-top: 5px;
+}
+
+.tooltip[x-placement^="bottom"] .tooltip-arrow {
+  border-width: 0 5px 5px 5px;
+  border-left-color: transparent !important;
+  border-right-color: transparent !important;
+  border-top-color: transparent !important;
+  top: -5px;
+  left: calc(50% - 5px);
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.tooltip[x-placement^="right"] {
+  margin-left: 5px;
+}
+
+.tooltip[x-placement^="right"] .tooltip-arrow {
+  border-width: 5px 5px 5px 0;
+  border-left-color: transparent !important;
+  border-top-color: transparent !important;
+  border-bottom-color: transparent !important;
+  left: -5px;
+  top: calc(50% - 5px);
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.tooltip[x-placement^="left"] {
+  margin-right: 5px;
+}
+
+.tooltip[x-placement^="left"] .tooltip-arrow {
+  border-width: 5px 0 5px 5px;
+  border-top-color: transparent !important;
+  border-right-color: transparent !important;
+  border-bottom-color: transparent !important;
+  right: -5px;
+  top: calc(50% - 5px);
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.tooltip.popover .popover-inner {
+  background: #f9f9f9;
+  color: black;
+  padding: 24px;
+  border-radius: 5px;
+  box-shadow: 0 5px 30px rgba(black, .1);
+}
+
+.tooltip.popover .popover-arrow {
+  border-color: #f9f9f9;
+}
+
+.tooltip[aria-hidden='true'] {
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity .15s, visibility .15s;
+}
+
+.tooltip[aria-hidden='false'] {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity .15s;
+}
+/** ------------------------- /tooltip ----------------- **/
+
 </style>
