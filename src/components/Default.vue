@@ -426,7 +426,7 @@ this.clients.related.push({})
   bottom:0;
   border-top-right-radius:5%;
   background-color:rgba(255,255,255,.8);
-  z-index:-98;
+  /*z-index:-98;*/
 }
 
 #map-menu > li{padding:0 3px;}
