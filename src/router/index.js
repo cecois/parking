@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Default from '@/components/Default'
-// import ATL from '@/components/atl'
+import DEFAULT from '@/components/Default'
+import TIMELINE from '@/components/timeline'
 
 Vue.use(Router)
 
@@ -9,14 +9,14 @@ export default new Router({
   routes: [
   {
     // path: '/:lot?/:slug?/:map?/:bbox?',
-    path: '/:map?/:bbox?/:lot?',
+    path: '/',
     name: 'Default',
-    component: Default
+    component: DEFAULT
   }
-  // ,{
-  //   path: '/atl',
-  //   name: 'ATL',
-  //   component: ATL
-  // }
+  ,{
+    path: '/:component?',
+    name: 'Timeline',
+    component: TIMELINE
+  }
   ]
 })
